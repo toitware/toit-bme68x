@@ -106,32 +106,32 @@ class Bme68x:
   // Temperature registers.
   // Bme680, section 3.3.1, table 11.
   // Bme688, section 3.6.1, table 13
-  static TEMPERATURE_ADC_REGISTER_ ::= 0x22 // 20 bits. 0x22=MSB.
+  static TEMPERATURE_ADC_REGISTER_ ::= 0x22 // 20 bits. (Reg_0x24 & 0xF0)=LSB.
   // Calibration:
-  static PAR_T1_REGISTER_ ::=  0xE9  // 16 bits. 0xE9=LSB.
-  static PAR_T2_REGISTER_ ::=  0x8A  // 16 bits. 0x8A=LSB.
+  static PAR_T1_REGISTER_ ::=  0xE9  // 16 bits. 0xEA=MSB.
+  static PAR_T2_REGISTER_ ::=  0x8A  // 16 bits. 0x8B=MSB.
   static PAR_T3_REGISTER_ ::=  0x8C  // 8 bits.
 
   // Pressure registers.
   // BME680, section 3.3.2, table 12.
   // BME688, section 3.6.2, table 14
-  static PRESSURE_ADC_REGISTER_ ::= 0x1F // 20 bits. 0x1F=MSB.
+  static PRESSURE_ADC_REGISTER_ ::= 0x1F // 20 bits. (Reg_0x21 & 0xF0)=LSB
   // Calibration:
-  static PAR_P1_REGISTER_ ::=  0x8E  // 16 bits. 0x8E=LSB.
-  static PAR_P2_REGISTER_ ::=  0x90  // 16 bits. 0x90=LSB.
+  static PAR_P1_REGISTER_ ::=  0x8E  // 16 bits. 0x8F=MSB.
+  static PAR_P2_REGISTER_ ::=  0x90  // 16 bits. 0x91=MSB.
   static PAR_P3_REGISTER_ ::=  0x92  // 8 bits.
-  static PAR_P4_REGISTER_ ::=  0x94  // 16 bits. 0x94=LSB.
-  static PAR_P5_REGISTER_ ::=  0x96  // 16 bits. 0x96=LSB.
+  static PAR_P4_REGISTER_ ::=  0x94  // 16 bits. 0x95=MSB.
+  static PAR_P5_REGISTER_ ::=  0x96  // 16 bits. 0x97=MSB.
   static PAR_P6_REGISTER_ ::=  0x99  // 8 bits.
   static PAR_P7_REGISTER_ ::=  0x98  // 8 bits.
-  static PAR_P8_REGISTER_ ::=  0x9C  // 16 bits. 0x9C=LSB.
-  static PAR_P9_REGISTER_ ::=  0x9E  // 16 bits. 0x9E=LSB.
+  static PAR_P8_REGISTER_ ::=  0x9C  // 16 bits. 0x9D=MSB.
+  static PAR_P9_REGISTER_ ::=  0x9E  // 16 bits. 0x9F=MSB.
   static PAR_P10_REGISTER_ ::= 0xA0  // 8 bits.
 
   // Humidity registers.
   // BME680, section 3.3.3, table 13.
   // BME688, section 3.6.3, table 15
-  static HUMIDITY_ADC_REGISTER_ ::= 0x25 // 16 bits. 0x25=MSB.
+  static HUMIDITY_ADC_REGISTER_ ::= 0x25 // 16 bits. 0x26=LSB.
   // Calibration:
   static PAR_H1_LSB_REGISTER_ ::= 0xE2  // Shared with PAR_H2_LSB_REGISTER_. Lower nibble.
   static PAR_H1_MSB_REGISTER_ ::= 0xE3
@@ -145,15 +145,15 @@ class Bme68x:
 
   // Gas registers.
   // BME680, section 3.4.1, table 15.
-  static BME680_GAS_ADC_REGISTER_ ::= 0x2A // 12 bits. 0x2A=MSB. 0x2B=LSB, shared with range.
+  static BME680_GAS_ADC_REGISTER_ ::= 0x2A // 10 bits. 0x2A=MSB. (Reg_0x2B & 0xC0)=LSB, shared with range.
   static BME680_GAS_RANGE_REGISTER_ ::= 0x2B // Shared with ADC. Lower nibble.
   // BME688, section 3.6.5, table 16, 3.7.1, table 17
-  static BME688_GAS_ADC_REGISTER_ ::= 0x2C // 12 bits. 0x2C=MSB. 0x2D=LSB, shared with range.
+  static BME688_GAS_ADC_REGISTER_ ::= 0x2C // 10 bits. 0x2C=MSB. (Reg_0x2D & 0xC0)=LSB, shared with range.
   static BME688_GAS_RANGE_REGISTER_ ::= 0x2D // Shared with ADC. Lower nibble.
   // Same for BME680 and BME688.
   // Calibration:
   static PAR_G1_REGISTER_ ::= 0xED // 8 bits.
-  static PAR_G2_REGISTER_ ::= 0xEB // 16 bits. 0xEB=LSB.
+  static PAR_G2_REGISTER_ ::= 0xEB // 16 bits. 0xEC=MSB.
   static PAR_G3_REGISTER_ ::= 0xEE // 8 bits.
   // According to datasheet
   static RES_HEAT_VAL_REGISTER_ ::= 0x00    // 8 bits.
@@ -432,7 +432,15 @@ class Bme68x:
   extract_gas_resistance_:
     // We are not using $extract_gas_resistance_ --raw, as we also need the least significant
     // bits of the register. No need to do two register reads.
-    gas_values := registers_.read_u16_be BME688_GAS_ADC_REGISTER_
+    register/int := ?
+    if variant_ == BME680_VARIANT_:
+      register = BME680_GAS_ADC_REGISTER_
+    else if variant_ == BME688_VARIANT_:
+      register = BME680_GAS_ADC_REGISTER_
+    else:
+      throw "UNKNOWN_VARIANT"
+
+    gas_values := registers_.read_u16_be register
     adc := gas_values >> 6
     range := gas_values & 0x0F
     if (gas_values & GAS_VALID_MASK_) == 0: throw "GAS_NOT_VALID"
@@ -448,7 +456,15 @@ class Bme68x:
     return extract_gas_resistance_ --raw
 
   extract_gas_resistance_ --raw/bool -> int:
-    raw_value := registers_.read_u16_be BME688_GAS_ADC_REGISTER_
+    register/int := ?
+    if variant_ == BME680_VARIANT_:
+      register = BME680_GAS_ADC_REGISTER_
+    else if variant_ == BME688_VARIANT_:
+      register = BME680_GAS_ADC_REGISTER_
+    else:
+      throw "UNKNOWN_VARIANT"
+
+    raw_value := registers_.read_u16_be register
     if raw_value & GAS_VALID_MASK_ == 0: throw "GAS_NOT_VALID"
     if raw_value & HEAT_STAB_MASK_ == 0: throw "HEATER_NOT_STABILIZED"
     raw_value >>= 6
@@ -679,9 +695,9 @@ class Bme68x:
   Gas measurements are only enabled with a valid heater configuration.
 
   The $degrees parameter sets the temperature in Celsius the heater should be at. It must be
-    in range [0..400] degrees.
+    in range the [0..400] degrees.
   The $ms parameter defines the time the heater should spend at that temperature before measuring. It
-    must be in range [0..4032].
+    must be in the range [0..4032].
 
   Typical values are ~320 degrees and ~150ms.
 
@@ -771,7 +787,7 @@ class Bme68x:
     var3 := calibration_.par_g3 / 1024.0
     var4 := var1 * (1.0 + (var2 * target_temp))
     var5 := var4 + (var3 * amb_temp)
-    res_heat := (3.4 * ((var5 * (4.0 / (4.0 + res_heat_range)) * (1.0 / (1.0 + (res_heat_val * 0.002)))) - 25))
+    res_heat := 3.4 * ((var5 * (4.0 / (4.0 + res_heat_range)) * (1.0 / (1.0 + (res_heat_val * 0.002)))) - 25)
 
     return res_heat.to_int
 
