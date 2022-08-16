@@ -36,7 +36,7 @@ class Measurement:
   constructor --.temperature --.pressure --.humidity --.gas_resistance:
 
   stringify -> string:
-    str := "$(%.3f temperature)°C, $(%.3f pressure) Pa, $(%.3f humidity)%"
+    str := "$(%.3f temperature)°C, $(%.3f pressure)Pa, $(%.3f humidity)%"
     if gas_resistance: str += ", $gas_resistance Ohm"
     return str
 
@@ -80,7 +80,7 @@ class Bme68x:
 
   static CTRL_MEAS_REGISTER_ ::= 0x74
   // Gives the variant ID of this chip.
-  // The BME680 doesn't have this register yet.
+  // The BME680 doesn't have this register.
   static VARIANT_ID_REGISTER_ ::= 0xF0
 
   // Bme680, section 5.3.2.4
