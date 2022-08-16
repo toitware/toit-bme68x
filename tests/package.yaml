@@ -1,1 +1,3 @@
-# Toit Package File.
+dependencies:
+  bme68x:
+    path: ..
