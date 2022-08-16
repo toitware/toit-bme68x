@@ -26,7 +26,6 @@ main:
 
     // Read the individual sensor values:
     print "temperature: $sensor.read_temperature"
-    // Note that the gas resistance is not reliable in the first 300+ measurements.
     print "gas resistance: $sensor.read_gas_resistance Ohm"
     print "pressure: $sensor.read_pressure Pa"
     print "humidity: $sensor.read_humidity%"
