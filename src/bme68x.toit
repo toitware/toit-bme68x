@@ -436,7 +436,7 @@ class Bme68x:
     if variant_ == BME680_VARIANT_:
       register = BME680_GAS_ADC_REGISTER_
     else if variant_ == BME688_VARIANT_:
-      register = BME680_GAS_ADC_REGISTER_
+      register = BME688_GAS_ADC_REGISTER_
     else:
       throw "UNKNOWN_VARIANT"
 
@@ -460,7 +460,7 @@ class Bme68x:
     if variant_ == BME680_VARIANT_:
       register = BME680_GAS_ADC_REGISTER_
     else if variant_ == BME688_VARIANT_:
-      register = BME680_GAS_ADC_REGISTER_
+      register = BME688_GAS_ADC_REGISTER_
     else:
       throw "UNKNOWN_VARIANT"
 
