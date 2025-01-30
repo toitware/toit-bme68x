@@ -6,15 +6,15 @@ import gpio
 import i2c
 import bme68x
 
-SDA_PIN_NUMBER ::= 21
-SCL_PIN_NUMBER ::= 22
+SDA-PIN-NUMBER ::= 21
+SCL-PIN-NUMBER ::= 22
 
 main:
   bus := i2c.Bus
-    --sda=gpio.Pin SDA_PIN_NUMBER
-    --scl=gpio.Pin SCL_PIN_NUMBER
+    --sda=gpio.Pin SDA-PIN-NUMBER
+    --scl=gpio.Pin SCL-PIN-NUMBER
 
-  device := bus.device bme68x.Bme68x.I2C_ADDRESS
+  device := bus.device bme68x.Bme68x.I2C-ADDRESS
   sensor := bme68x.Bme68x device
 
   sensor.on
@@ -25,10 +25,10 @@ main:
     print sensor.read
 
     // Read the individual sensor values:
-    print "temperature: $sensor.read_temperature"
-    print "gas resistance: $sensor.read_gas_resistance Ohm"
-    print "pressure: $sensor.read_pressure Pa"
-    print "humidity: $sensor.read_humidity%"
+    print "temperature: $sensor.read-temperature"
+    print "gas resistance: $sensor.read-gas-resistance Ohm"
+    print "pressure: $sensor.read-pressure Pa"
+    print "humidity: $sensor.read-humidity%"
     print
 
     sleep --ms=1_000

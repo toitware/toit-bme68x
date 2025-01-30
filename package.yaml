@@ -1,2 +1,5 @@
 name: bme68x
 description: Driver for the BME680 and BME688 sensors.
+
+environment:
+  sdk: ^2.0.0-alpha.120
