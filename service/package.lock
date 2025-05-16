@@ -1,0 +1,5 @@
+prefixes:
+  bme68x: ..
+packages:
+  ..:
+    path: ..
