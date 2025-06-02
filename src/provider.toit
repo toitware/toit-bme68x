@@ -34,19 +34,15 @@ class Sensor_
       sensor_.on
       is-exception = false
     finally:
-      if is-exception:
-        if device_: device_.close
-        if i2c_: i2c_.close
-        if sda_: sda_.close
-        if scl_: scl_.close
+      if is-exception: close
 
   temperature-read -> float?:
     return sensor_.read-temperature
 
-  humidity-read -> float:
+  humidity-read -> float?:
     return sensor_.read-humidity
 
-  pressure-read -> float:
+  pressure-read -> float?:
     return sensor_.read-pressure
 
   close -> none:
