@@ -1,0 +1,24 @@
+{
+  "$schema": "http://json-schema.org/draft-2020-12/schema",
+  "$id": "https://github.com/toitware/toit-bme68x/service/schema.json",
+  "title": "BME68x Configuration",
+  "description": "Configuration for the BME680 temperature, humidity, pressure and gas sensor.",
+  "type": "object",
+  "required": [
+    "scl",
+    "sda"
+  ],
+  "properties": {
+    "scl": {
+      "type": "integer",
+      "description": "The GPIO pin number of the SCL pin of the I2C bus."
+    },
+    "sda": {
+      "type": "integer",
+      "description": "The GPIO pin number of the SDA pin of the I2C bus."
+    },
+    "address": {
+      "description": "The I2C address of the BME68x sensor. If absent uses the default address. If set to 'alt' uses the alternate address. Otherwise, the address must be a valid I2C address."
+    }
+  }
+}
